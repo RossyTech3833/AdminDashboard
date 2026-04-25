@@ -67,7 +67,7 @@ const navigate = useNavigate()
     user.email.toLowerCase().includes(search.toLocaleLowerCase())
   )
 
-  const handleclick = (id:number) => {
+  const handleclick = (id:string) => {
     navigate(`/users/${id}`);
   };
 

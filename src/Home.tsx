@@ -1,0 +1,209 @@
+
+import { useMutation, useQuery} from '@tanstack/react-query'
+import  { useState } from 'react'
+import NewUser from './NewUser'
+import { useNavigate } from 'react-router-dom'
+import { queryClient } from './main'
+
+
+type NewMemberForm = {
+  name: string;
+  email: string;
+  company: string;
+  city: string;
+}
+
+type Member = {
+  id: string;
+  name: string;
+  email: string;
+  company: { name: string };
+  address: { city: string };
+}
+function Home() {
+
+const navigate = useNavigate()
+
+  const [search, setSearch] = useState('')
+  const [form, setForm]  = useState(false)   
+  const [newMembers, setNewMembers] = useState([])
+
+  const [page,setPage] = useState(1)
+
+  const BASE_URL = `https://jsonplaceholder.typicode.com/users`  
+  
+  const fetchusers = async (page : number): Promise<FormData[]> => {
+    const res = await fetch(`https://jsonplaceholder.typicode.com/users?_page=${page}&_limit=5`)
+    if (!res.ok) throw new Error('error fetching data')
+    return res.json()
+  }
+
+  const { data, isLoading, error,isPlaceholderData} = useQuery({
+    queryFn: () => fetchusers(page),
+    queryKey: ['users',page],
+     keepPreviousData: true,
+    staleTime:60 * 1000, 
+    // the staletime of 60 seconds is important because of
+    //  pagination,moving from one users page to another
+  })
+
+  //  called from NewUser form on submit
+  const handleAddMember = (formData: NewMemberForm) => {
+    const newMember: Member = {
+      id: String(Date.now()),
+      name: formData.name,
+      email: formData.email,
+      company: { name: formData.company },
+      address: { city: formData.city },
+    }
+    setNewMembers((prev) => [...prev, newMember])
+  }
+
+  
+  const allUsers = [...(data ?? []), ...newMembers]
+
+  const filtered = allUsers.filter((user) =>
+    user.name.toLowerCase().includes(search.toLowerCase()) ||
+    user.email.toLowerCase().includes(search.toLocaleLowerCase())
+  )
+
+  const handleclick = (id:number) => {
+    navigate(`/users/${id}`);
+  };
+
+  const handleremove = (id: number) => {
+    const confirmed = window.confirm("Are You sure you want to remove this member")
+   if(confirmed) removeMember(id);
+  };
+
+// to remove a member
+const { mutate: removeMember } = useMutation({
+  mutationFn: async (userId: number) => {
+    const res = await fetch(`${BASE_URL}/${userId}`, 
+    { method: 'DELETE' })
+    if (!res.ok) throw new Error('error deleting user')
+    return res.json()
+  },
+  onSuccess: (_, userId) => {
+    // remove from local state if it's a locally added member
+    setNewMembers((prev) => prev.filter((m) => m.id !== userId))
+    queryClient.invalidateQueries({ queryKey: ['users'] })
+  }
+})
+
+
+const handleMouseEnter = () => {
+  queryClient.prefetchQuery({
+    queryKey : ['users', page + 1],
+    queryFn :()=> fetchusers(page + 1),
+    staleTime:10_000
+  })
+}
+
+
+if (isLoading) return (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-10 px-6">
+    {Array.from({ length: 5 }).map((_, i) => (
+      <div key={i} className="flex justify-center">
+        <div className="border-b shadow-lg shadow-black p-10 w-full space-y-3">
+          <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
+          <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+          <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
+          <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
+          <div className="h-8 bg-red-200 rounded animate-pulse w-1/3 mt-6" />
+        </div>
+      </div>
+    ))}
+  </div>
+)
+
+  if (error)     return <p>Error occurred</p>
+
+
+
+
+
+
+  return (
+
+    <div>
+      
+      {form && (
+        <NewUser
+      onAddMember={handleAddMember}
+      onClose={() => setForm(false)}
+        />
+      )}
+
+      <h1 className="flex justify-center m-20 uppercase text-white text-2xl lg:text-5xl md:text-5xl">Admin 
+      <span className='text-red-900'>Dashboard</span></h1>
+      
+      <ul className="flex justify-center gap-6 flex-wrap">
+
+        {/* Search */}
+        <input
+       className="border text-center px-4 py-2 rounded-lg outline-none border-red-900 text-white text-lg md:text-2xl
+       focus:ring-2 focus:ring-blue-400"
+        type="text"
+         placeholder="Search members..."
+        value={search}
+         onChange={(e) => setSearch(e.target.value)}
+        />
+
+        <button
+        onClick={() => setForm(true)}  
+        className="border px-4 py-2 rounded-lg bg-blue-800 text-white 
+        hover:bg-blue-700 transition cursor-pointer"
+        >
+          + Add New Member
+        </button>
+
+      </ul>
+      <h1 className='flex justify-center  mt-20 uppercase text-3xl text-red-900 text-white'>all users</h1>
+      {/* User Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-10 px-6 text-white">
+        {filtered.map((user) => (
+          <div key={user.id} 
+          onClick={() => handleclick(user.id)}
+          className="flex justify-center">
+      <div className="border-b shadow-lg shadow-white transition-all duration-300 
+         ease-in-out hover:scale-105 p-10 w-full">
+     <h1>NAME: {user.name}</h1>
+   <h1 className="mt-2">EMAIL: {user.email}</h1>
+    <h1 className="mt-2">COMPANY: {user.company.name}</h1>
+    <h1 className="mt-2">CITY: {user.address.city}</h1>
+  
+
+     <button
+  onClick={(e) => {
+    e.stopPropagation(); // prevents card click from firing
+    handleremove(user.id); // pass id, not the whole user
+  }}
+  className="border cursor-pointer mt-6 bg-red-900 text-white p-2"
+>
+  remove member
+</button>
+
+        </div>
+       </div>
+        ))}
+
+        
+      </div>
+      <div className='gap-4 flex justify-center p-4 mt-20'>
+          <button onClick={()=>setPage((prev)=> Math.max(prev - 1, 1))}
+          disabled={page === 1}
+           className='border p-2 border-white text-white cursor-pointer'>
+          previous page
+          </button>
+
+          <button onMouseEnter={handleMouseEnter} onClick={() => setPage((prev) => prev + 1)}
+          disabled={isPlaceholderData}
+          className='border cursor-pointer bg-red-900 p-2' >
+             next page</button>
+        </div>
+    </div>
+  )
+}
+
+export default Home

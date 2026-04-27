@@ -1,4 +1,4 @@
-import { BrowserRouter as Router,Route,Routes } from 'react-router-dom'
+import { HashRouter,Route,Routes } from 'react-router-dom'
 import './App.css'
 import Home from './Home'
 import { MembersDetails } from './MembersDetails'
@@ -11,13 +11,13 @@ function App() {
   return (
     
       <div>
-        <Router>
+        <HashRouter>
           <Routes>
             <Route path='/' element = {<Home/>}/>
             <Route path='users/:id' element={<MembersDetails />} />
             <Route path ='users' element={<Home/>} />
           </Routes>
-        </Router>
+        </HashRouter>
         <Footer/>
         
       </div>

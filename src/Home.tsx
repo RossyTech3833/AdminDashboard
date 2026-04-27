@@ -39,7 +39,7 @@ function Home() {
   const { data, isLoading, error, isPlaceholderData } = useQuery({
     queryFn: () => fetchusers(page),
     queryKey: ['users', page],
-    placeholderData: (previousData) => previousData,
+    placeholderData: (previousData: Member[] | undefined) => previousData,
     staleTime: 60 * 1000,
   })
 

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, keepPreviousData } from '@tanstack/react-query'
 import { useState } from 'react'
 import NewUser from './NewUser'
 import { useNavigate } from 'react-router-dom'
@@ -36,10 +36,10 @@ function Home() {
     return res.json()
   }
 
-  const { data, isLoading, error, isPlaceholderData } = useQuery({
+  const { data, isLoading, error, isPlaceholderData, refetch } = useQuery({
     queryFn: () => fetchusers(page),
     queryKey: ['users', page],
-    placeholderData: (previousData: Member[] | undefined) => previousData,
+    placeholderData: keepPreviousData,
     staleTime: 60 * 1000,
   })
 
@@ -91,6 +91,10 @@ function Home() {
     })
   }
 
+  const handlerror = () => {
+    refetch()
+  }
+
   if (isLoading) return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-10 px-6">
       {Array.from({ length: 5 }).map((_, i) => (
@@ -107,7 +111,10 @@ function Home() {
     </div>
   )
 
-  if (error) return <p>Error occurred</p>
+  if (error) return <div>
+    <p>an error occured</p>
+    <button onClick={handlerror}>PLS retry</button>
+  </div>
 
   return (
     <div>
@@ -116,6 +123,7 @@ function Home() {
         <NewUser
           onAddMember={handleAddMember}
           onClose={() => setForm(false)}
+          isPending={isLoading}
         />
       )}
 

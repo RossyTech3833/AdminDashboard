@@ -9,6 +9,7 @@ import type { Resolver } from 'react-hook-form'
 const schema = yup.object({
   name:    yup.string().required('Name is required'),
   email:   yup.string().email('Invalid email').required('Email is required'),
+  username: yup.string().required('username is required'),
   company: yup.string().required('Company name is required'),
   city:    yup.string().required('City name is required'),
 })
@@ -18,14 +19,15 @@ export type NewMemberForm = yup.InferType<typeof schema>
 type Props = {
   onAddMember: (data: NewMemberForm) => void
   onClose: () => void
+  isPending: boolean
 }
 
-function NewUser({ onAddMember, onClose }: Props) {
+function NewUser({ onAddMember, onClose, isPending }: Props) {
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<NewMemberForm>({
     resolver: yupResolver(schema) as Resolver<NewMemberForm>,
   })
@@ -79,6 +81,18 @@ function NewUser({ onAddMember, onClose }: Props) {
      {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
        </div>
 
+       <div className="flex flex-col gap-1">
+     <label className="text-sm font-medium text-gray-700">Username</label>
+     <input
+        {...register('username')}
+      placeholder="RossyRossy"
+        className={`w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition
+       focus:ring-2 focus:ring-blue-500 focus:border-transparent
+         ${errors.username ? 'border-red-400 bg-red-50' : 'border-gray-300 hover:border-gray-400'}`}
+       />
+     {errors.username && <p className="text-xs text-red-500">{errors.username.message}</p>}
+       </div>
+
      <div className="flex flex-col gap-1">
      <label className="text-sm font-medium text-gray-700">Company</label>
      <input
@@ -105,12 +119,12 @@ function NewUser({ onAddMember, onClose }: Props) {
 
       <button
      type="submit"
-     disabled={isSubmitting}
+     disabled={isPending}
       className="w-full mt-2 py-2.5 px-4 bg-blue-600 hover:bg-blue-700
      disabled:bg-blue-300 disabled:cursor-not-allowed
      text-white text-sm font-medium rounded-lg transition cursor-pointer"
        >
-      {isSubmitting ? 'Adding...' : 'Add New Member'}
+      {isPending ? 'Adding...' : 'Add New Member'}
      </button>
 
         </form>

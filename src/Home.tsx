@@ -3,6 +3,7 @@ import { useState } from 'react'
 import NewUser from './NewUser'
 import { useNavigate } from 'react-router-dom'
 import { queryClient } from './main'
+import axios from 'axios'
 
 type NewMemberForm = {
   name: string;
@@ -31,9 +32,9 @@ function Home() {
   const BASE_URL = `https://jsonplaceholder.typicode.com/users`
 
   const fetchusers = async (page: number): Promise<Member[]> => {
-    const res = await fetch(`https://jsonplaceholder.typicode.com/users?_page=${page}&_limit=5`)
-    if (!res.ok) throw new Error('error fetching data')
-    return res.json()
+    const res = await axios.get(`https://jsonplaceholder.typicode.com/users?_page=${page}&_limit=5`)
+    // if (!res.ok) throw new Error('error fetching data')
+    return res.data
   }
 
   const { data, isLoading, error, isPlaceholderData, refetch } = useQuery({
@@ -73,9 +74,9 @@ function Home() {
 
   const { mutate: removeMember } = useMutation({
     mutationFn: async (userId: string) => {
-      const res = await fetch(`${BASE_URL}/${userId}`, { method: 'DELETE' })
-      if (!res.ok) throw new Error('error deleting user')
-      return res.json()
+      const res = await axios.delete(`${BASE_URL}/${userId}`)
+      
+      return res.data
     },
     onSuccess: (_, userId) => {
       setNewMembers((prev) => prev.filter((m) => m.id !== userId))

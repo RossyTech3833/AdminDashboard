@@ -1,6 +1,7 @@
 // import React from 'react'
 import {  useParams } from 'react-router-dom'
 import { useQuery} from '@tanstack/react-query'
+import axios from 'axios'
 
 
 export type Todos ={
@@ -28,9 +29,9 @@ const {id} =useParams()
   const TODO_URL = `https://jsonplaceholder.typicode.com/todos?userId=${id}&_limit=8`
 
   const fetchtodos = async (): Promise<Todos[]> => {
-    const res = await fetch(TODO_URL)
-    if (!res.ok) throw new Error('error fetching data')
-    return res.json()
+    const res = await axios.get(TODO_URL)
+   
+    return res.data
   }
 
   const { data:todosData ,
@@ -47,9 +48,9 @@ const {id} =useParams()
   const POST_URL = `https://jsonplaceholder.typicode.com/posts?userId=${id}&_limit=5`
 
   const fetchposts = async (): Promise<posts[]> => {
-    const res = await fetch(POST_URL)
-    if (!res.ok) throw new Error('error fetching data')
-    return res.json()
+    const res = await axios.get(POST_URL)
+    
+    return res.data
   }
 
   const { data:postData ,

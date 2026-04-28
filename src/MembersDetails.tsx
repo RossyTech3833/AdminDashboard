@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useParams, useNavigate } from "react-router-dom"
 import TodosPost from "./TodosPost"
 import { useState } from "react"
+import axios from "axios"
 
 export type users = {
   id: number
@@ -21,9 +22,9 @@ export const MembersDetails = () => {
   const BASE_URL = `https://jsonplaceholder.typicode.com/users/${id}`
 
   const fetchUser = async (): Promise<users> => {
-    const res = await fetch(BASE_URL)
-    if (!res.ok) throw new Error("Error fetching data")
-    return res.json()
+    const res = await axios.get(BASE_URL)
+   
+    return res.data
   }
 
   const { data, isLoading, error } = useQuery({
@@ -47,16 +48,11 @@ export const MembersDetails = () => {
 
   const editMutation = useMutation({
     mutationFn: async (updatedUser: users) => {
-      const res = await fetch(
+      const res = await axios.patch<users>(
         `https://jsonplaceholder.typicode.com/users/${updatedUser.id}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedUser),
-        }
+       updatedUser
       )
-      if (!res.ok) throw new Error("Failed to update user")
-      return res.json() as Promise<users>
+      return res.data
     },
 
     onSuccess: (updatedUser) => {

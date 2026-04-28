@@ -37,7 +37,7 @@ function Home() {
     return res.data
   }
 
-  const { data, isLoading, error, isPlaceholderData, refetch } = useQuery({
+  const { data, isLoading, error, isPlaceholderData,refetch,isFetching } = useQuery({
     queryFn: () => fetchusers(page),
     queryKey: ['users', page],
     placeholderData: keepPreviousData,
@@ -92,9 +92,6 @@ function Home() {
     })
   }
 
-  const handlerror = () => {
-    refetch()
-  }
 
   if (isLoading) return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-10 px-6">
@@ -114,8 +111,13 @@ function Home() {
 
   if (error) return <div>
     <p>an error occured</p>
-    <button onClick={handlerror}>PLS retry</button>
-  </div>
+     <button onClick={()=> refetch()}
+    disabled={isFetching}
+    >{isFetching? 'Retrying....' : 'PLS retry'}</button> 
+  </div> 
+
+
+
 
   return (
     <div>

@@ -67,6 +67,7 @@ function Home() {
     onSuccess: (_, formData) => {
       handleAddMember(formData)
       queryClient.invalidateQueries({ queryKey: ['users'] })
+      setForm(false)
     }
   })
 

@@ -26,8 +26,7 @@ type Member = {
 const BASE_URL = `https://jsonplaceholder.typicode.com/users`
 
 const fetchusers = async (page: number): Promise<Member[]> => {
-  const res = await axios.get(`https://jsonplaceholder.typicode.com/users?_page=${page}&_limit=5`)
-  
+  const res = await axios.get(`${BASE_URL}?_page=${page}&_limit=5`)
   return res.data
 }
 
@@ -40,27 +39,36 @@ function Home() {
   const [newMembers, setNewMembers] = useState<Member[]>([])
   const [page, setPage] = useState(1)
 
-
-
-  const { data, isLoading, error, isPlaceholderData,refetch,isFetching } = useQuery({
+  const { data, isLoading, error, isPlaceholderData, refetch, isFetching } = useQuery({
     queryFn: () => fetchusers(page),
     queryKey: ['users', page],
     placeholderData: keepPreviousData,
     staleTime: 60 * 1000,
   })
 
-  // called from NewUser form on submit
   const handleAddMember = (formData: NewMemberForm) => {
     const newMember: Member = {
       id: String(Date.now()),
       name: formData.name,
       email: formData.email,
-      username:formData.username,
+      username: formData.username,
       company: { name: formData.company },
       address: { city: formData.city },
     }
     setNewMembers((prev) => [...prev, newMember])
   }
+
+  
+  const { mutate: addMember, isPending: isAdding } = useMutation({
+    mutationFn: async (formData: NewMemberForm) => {
+      const res = await axios.post(BASE_URL, formData)
+      return res.data
+    },
+    onSuccess: (_, formData) => {
+      handleAddMember(formData)
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    }
+  })
 
   const allUsers = [...(data ?? []), ...newMembers]
 
@@ -81,7 +89,6 @@ function Home() {
   const { mutate: removeMember } = useMutation({
     mutationFn: async (userId: string) => {
       const res = await axios.delete(`${BASE_URL}/${userId}`)
-      
       return res.data
     },
     onSuccess: (_, userId) => {
@@ -97,7 +104,6 @@ function Home() {
       staleTime: 10_000
     })
   }
-
 
   if (isLoading) return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-10 px-6">
@@ -115,25 +121,27 @@ function Home() {
     </div>
   )
 
-  if (error) return <div>
-    <p className='text-white capitalize '>an error occured</p>
-     <button onClick={()=> refetch()}
-    disabled={isFetching}
-    className='text-white cursor-pointer'
-    >{isFetching? 'Retrying....' : 'PLS retry'}</button> 
-  </div> 
-
-
-
+  if (error) return (
+    <div className='p-10 m-10'>
+      <p className='text-red-800 capitalize'>an error occured</p>
+      <button
+        onClick={() => refetch()}
+        disabled={isFetching}
+        className='text-white cursor-pointer'
+      >
+        {isFetching ? 'Retrying....' : 'PLS retry'}
+      </button>
+    </div>
+  )
 
   return (
     <div>
 
       {form && (
         <NewUser
-          onAddMember={handleAddMember}
+          onAddMember={addMember}       
           onClose={() => setForm(false)}
-          isPending={isLoading}
+          isPending={isAdding}        
         />
       )}
 
@@ -142,8 +150,6 @@ function Home() {
       </h1>
 
       <ul className="flex justify-center gap-6 flex-wrap">
-
-        {/* Search */}
         <input
           className="border text-center px-4 py-2 rounded-lg outline-none border-red-900 text-white text-lg md:text-2xl
           focus:ring-2 focus:ring-blue-400"
@@ -160,12 +166,10 @@ function Home() {
         >
           + Add New Member
         </button>
-
       </ul>
 
       <h1 className='flex justify-center mt-20 uppercase text-3xl text-red-900 text-white'>all users</h1>
 
-      {/* User Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-10 px-6 text-white">
         {filtered.map((user) => (
           <div
@@ -180,7 +184,6 @@ function Home() {
               <h1 className="mt-2">USERNAME: {user.username}</h1>
               <h1 className="mt-2">COMPANY: {user.company.name}</h1>
               <h1 className="mt-2">CITY: {user.address.city}</h1>
-              
 
               <button
                 onClick={(e) => {

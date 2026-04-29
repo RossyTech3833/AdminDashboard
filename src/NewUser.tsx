@@ -35,7 +35,8 @@ function NewUser({ onAddMember, onClose, isPending }: Props) {
   const onSubmit = (data: NewMemberForm) => {
     onAddMember(data)  
     reset()
-    onClose()          
+    onClose() 
+            
   }
 
 

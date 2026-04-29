@@ -113,9 +113,10 @@ function Home() {
   )
 
   if (error) return <div>
-    <p>an error occured</p>
+    <p className='text-white capitalize '>an error occured</p>
      <button onClick={()=> refetch()}
     disabled={isFetching}
+    className='text-white cursor-pointer'
     >{isFetching? 'Retrying....' : 'PLS retry'}</button> 
   </div> 
 

@@ -8,6 +8,7 @@ import axios from 'axios'
 type NewMemberForm = {
   name: string;
   email: string;
+  username: string;
   company: string;
   city: string;
 }
@@ -16,6 +17,7 @@ type Member = {
   id: string;
   name: string;
   email: string;
+  username: string;
   company: { name: string };
   address: { city: string };
 }
@@ -53,6 +55,7 @@ function Home() {
       id: String(Date.now()),
       name: formData.name,
       email: formData.email,
+      username:formData.username,
       company: { name: formData.company },
       address: { city: formData.city },
     }
@@ -174,8 +177,10 @@ function Home() {
               ease-in-out hover:scale-105 p-10 w-full">
               <h1>NAME: {user.name}</h1>
               <h1 className="mt-2">EMAIL: {user.email}</h1>
+              <h1 className="mt-2">USERNAME: {user.username}</h1>
               <h1 className="mt-2">COMPANY: {user.company.name}</h1>
               <h1 className="mt-2">CITY: {user.address.city}</h1>
+              
 
               <button
                 onClick={(e) => {

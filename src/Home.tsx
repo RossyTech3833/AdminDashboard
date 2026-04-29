@@ -20,6 +20,15 @@ type Member = {
   address: { city: string };
 }
 
+
+const BASE_URL = `https://jsonplaceholder.typicode.com/users`
+
+const fetchusers = async (page: number): Promise<Member[]> => {
+  const res = await axios.get(`https://jsonplaceholder.typicode.com/users?_page=${page}&_limit=5`)
+  
+  return res.data
+}
+
 function Home() {
 
   const navigate = useNavigate()
@@ -29,13 +38,7 @@ function Home() {
   const [newMembers, setNewMembers] = useState<Member[]>([])
   const [page, setPage] = useState(1)
 
-  const BASE_URL = `https://jsonplaceholder.typicode.com/users`
 
-  const fetchusers = async (page: number): Promise<Member[]> => {
-    const res = await axios.get(`https://jsonplaceholder.typicode.com/users?_page=${page}&_limit=5`)
-    // if (!res.ok) throw new Error('error fetching data')
-    return res.data
-  }
 
   const { data, isLoading, error, isPlaceholderData,refetch,isFetching } = useQuery({
     queryFn: () => fetchusers(page),

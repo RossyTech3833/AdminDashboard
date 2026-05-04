@@ -1,39 +1,36 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useParams, useNavigate } from "react-router-dom"
-import Todos from "./Todos"
 import { useState } from "react"
+import { useParams } from "react-router-dom"
+import { useQuery,useQueryClient,useMutation } from "@tanstack/react-query"
 import axios from "axios"
-import Post from "./Post"
 
 export type users = {
-  id: number
-  name: string
-  email: string
-  company: { name: string }
-  address: { city: string }
-}
-
-export const MembersDetails = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-
-  const [editingUser, setEditingUser] = useState<users | null>(null)
-
-  const BASE_URL = `https://jsonplaceholder.typicode.com/users/${id}`
-
-  const fetchUser = async (): Promise<users> => {
-    const res = await axios.get(BASE_URL)
-   
-    return res.data
+    id: number
+    name: string
+    email: string
+    company: { name: string }
+    address: { city: string }
   }
 
-  const { data, isLoading, error,refetch,isFetching } = useQuery({
-    queryKey: ["users", id],
-    queryFn: fetchUser,
-  })
 
-  const handleEdit = () => {
+
+function EditBt() {
+  const {id} = useParams()
+  const queryClient = useQueryClient()
+const [editingUser,setEditingUser] =useState<users | null>(null)
+
+const BASE_URL = `https://jsonplaceholder.typicode.com/users/${id}`
+
+const fetchUser = async (): Promise<users>   =>{
+  const res = await axios.get(BASE_URL)
+
+  return res.data
+}
+ const {data,isLoading,error} = useQuery({
+  queryKey:["users", id],
+queryFn: fetchUser
+ })
+
+const handleEdit = () => {
     if (data) setEditingUser(data)
   }
 
@@ -68,58 +65,18 @@ export const MembersDetails = () => {
     },
   })
 
-  if (isLoading) return <p>Loading...</p>
-  if (error) return (
-    <div className='p-10 m-10'>
-      <p className='text-red-800 capitalize'>an error occured</p>
-      <button
-        onClick={() => refetch()}
-        disabled={isFetching}
-        className='text-white cursor-pointer'
-      >
-        {isFetching ? 'Retrying....' : 'PLS retry'}
-      </button>
-    </div>
-  )
+if(isLoading) return<p>loading</p>
+if(error) return <p>error occured</p>
+
 
 
 
   return (
     <div>
-      <h1 className="text-2xl md:text-3xl lg:text-4xl uppercase mb-6 text-white text-center font-bold mt-30">
-        Check out the members details, posts and todos
-      </h1>
+      <button className="border cursor-pointer bg-red-700 text-white p-3"
+      onClick={handleEdit}></button>
 
-      <div className="flex justify-center mt-20 px-6">
-        <div className="border-b shadow-lg shadow-white text-white text-center p-10 w-full max-w-md">
-          <h1 className="text-2xl uppercase mb-6 text-white text-center">
-            Member Details
-          </h1>
-          <p>NAME: {data?.name}</p>
-          <p className="mt-2">EMAIL: {data?.email}</p>
-          <p className="mt-2">COMPANY: {data?.company.name}</p>
-          <p className="mt-2">CITY: {data?.address.city}</p>
-
-          <div className="flex gap-3 mt-6 justify-center">
-            <button
-              onClick={() => navigate("/")}
-              className="border cursor-pointer bg-blue-600 text-white p-2"
-            >
-              ← Back
-            </button>
-
-            {/* from here is the editing button */}
-            <button
-              onClick={handleEdit}
-              className="border cursor-pointer bg-red-700 text-white p-3"
-            >
-              Edit
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {editingUser && (
+        {editingUser && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded shadow-lg w-full max-w-md">
             <h2 className="text-xl font-bold mb-4 text-red-900 uppercase">
@@ -186,11 +143,8 @@ export const MembersDetails = () => {
           </div>
         </div>
       )}
-
-      <div>
-        <Todos />
-        <Post />
-      </div>
     </div>
   )
 }
+
+export default EditBt

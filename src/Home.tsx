@@ -4,6 +4,7 @@ import NewUser from './NewUser'
 import { useNavigate } from 'react-router-dom'
 import { queryClient } from './main'
 import axios from 'axios'
+import EditBt from './EditBt'
 
 type NewMemberForm = {
   name: string;
@@ -107,8 +108,24 @@ function Home() {
   }
 
   if (isLoading) return (
+       
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-10 px-6">
+
+      <div className='flex justify-center m-20'>
+   <div className='h-4 bg-gray-200 rounded animate-pulse w-64'/>
+      </div>
+
+      <div className='flex justify-center m-20'>
+   <div className='h-4 bg-gray-200 rounded animate-pulse w-48'/>
+   <div className='h-4 bg-gray-200 rounded animate-pulse w-36'/>
+      </div>
+
+      <div className='flex justify-center m-20'>
+   <div className='h-4 bg-gray-200 rounded animate-pulse w-32'/>
+      </div>
+
       {Array.from({ length: 5 }).map((_, i) => (
+        
         <div key={i} className="flex justify-center">
           <div className="border-b shadow-lg shadow-black p-10 w-full space-y-3">
             <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
@@ -134,6 +151,8 @@ function Home() {
       </button>
     </div>
   )
+
+  
 
   return (
     <div>
@@ -171,7 +190,7 @@ function Home() {
 
       <h1 className='flex justify-center mt-20 uppercase text-3xl text-red-900 text-white'>all users</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-10 px-6 text-white">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-10 px-6 text-white cursor-pointer">
         {filtered.map((user) => (
           <div
             key={user.id}
@@ -195,6 +214,8 @@ function Home() {
               >
                 remove member
               </button>
+
+              <EditBt/>
             </div>
           </div>
         ))}

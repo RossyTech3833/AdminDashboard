@@ -39,6 +39,7 @@ function Home() {
   const [form, setForm] = useState(false)
   const [newMembers, setNewMembers] = useState<Member[]>([])
   const [page, setPage] = useState(1)
+  const [deletinguser, setDeletingUser] = useState<string | null>(null) // tracks which user to delete
 
   const { data, isLoading, error, isPlaceholderData, refetch, isFetching } = useQuery({
     queryFn: () => fetchusers(page),
@@ -59,7 +60,6 @@ function Home() {
     setNewMembers((prev) => [...prev, newMember])
   }
 
-  
   const { mutate: addMember, isPending: isAdding } = useMutation({
     mutationFn: async (formData: NewMemberForm) => {
       const res = await axios.post(BASE_URL, formData)
@@ -72,6 +72,7 @@ function Home() {
     }
   })
 
+  // for the search button
   const allUsers = [...(data ?? []), ...newMembers]
 
   const filtered = allUsers.filter((user) =>
@@ -83,9 +84,17 @@ function Home() {
     navigate(`/users/${id}`)
   }
 
+  // Step 1: clicking remove just saves the id, opens the modal
   const handleremove = (id: string) => {
-    const confirmed = window.confirm("Are you sure you want to remove this member")
-    if (confirmed) removeMember(id)
+    setDeletingUser(id)
+  }
+
+  // Step 2: clicking "Remove" inside the modal fires the actual mutation
+  const handleConfirm = () => {
+    if (deletinguser) {
+      removeMember(deletinguser)
+      setDeletingUser(null)
+    }
   }
 
   const { mutate: removeMember } = useMutation({
@@ -99,6 +108,7 @@ function Home() {
     }
   })
 
+  // for pagination
   const handleMouseEnter = () => {
     queryClient.prefetchQuery({
       queryKey: ['users', page + 1],
@@ -108,24 +118,24 @@ function Home() {
   }
 
   if (isLoading) return (
-       
+  <div>
+   
+    <div className="flex justify-center m-20">
+      <div className="h-10 bg-gray-200 rounded animate-pulse w-64" />
+    </div>
+
+    <div className="flex justify-center gap-6">
+      <div className="h-10 bg-gray-200 rounded animate-pulse w-64" />
+      <div className="h-10 bg-gray-200 rounded animate-pulse w-40" />
+    </div>
+
+    <div className="flex justify-center mt-20">
+      <div className="h-8 bg-gray-200 rounded animate-pulse w-32" />
+    </div>
+
+    
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mt-10 px-6">
-
-      <div className='flex justify-center m-20'>
-   <div className='h-4 bg-gray-200 rounded animate-pulse w-64'/>
-      </div>
-
-      <div className='flex justify-center m-20'>
-   <div className='h-4 bg-gray-200 rounded animate-pulse w-48'/>
-   <div className='h-4 bg-gray-200 rounded animate-pulse w-36'/>
-      </div>
-
-      <div className='flex justify-center m-20'>
-   <div className='h-4 bg-gray-200 rounded animate-pulse w-32'/>
-      </div>
-
       {Array.from({ length: 5 }).map((_, i) => (
-        
         <div key={i} className="flex justify-center">
           <div className="border-b shadow-lg shadow-black p-10 w-full space-y-3">
             <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
@@ -137,7 +147,8 @@ function Home() {
         </div>
       ))}
     </div>
-  )
+  </div>
+)
 
   if (error) return (
     <div className='p-10 m-10'>
@@ -152,17 +163,38 @@ function Home() {
     </div>
   )
 
-  
-
   return (
     <div>
 
       {form && (
         <NewUser
-          onAddMember={addMember}       
+          onAddMember={addMember}
           onClose={() => setForm(false)}
-          isPending={isAdding}        
+          isPending={isAdding}
         />
+      )}
+
+     
+      {deletinguser && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-zinc-900 border border-red-900 rounded-lg p-8 w-80 text-white shadow-xl">
+            <p className="text-lg mb-6">Are you sure you want to remove this member? </p>
+            <div className="flex gap-4 justify-end">
+              <button
+                onClick={() => setDeletingUser(null)}
+                className="px-4 py-2 border border-white rounded text-white hover:bg-zinc-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="px-4 py-2 bg-red-900 text-white rounded hover:bg-red-700"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <h1 className="flex justify-center m-20 uppercase text-white text-2xl lg:text-5xl md:text-5xl">Admin
@@ -215,7 +247,7 @@ function Home() {
                 remove member
               </button>
 
-              <EditBt/>
+              <EditBt userId={user.id} />
             </div>
           </div>
         ))}

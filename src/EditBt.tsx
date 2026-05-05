@@ -1,40 +1,42 @@
 import { useState } from "react"
-import { useParams } from "react-router-dom"
-import { useQuery,useQueryClient,useMutation } from "@tanstack/react-query"
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
 import axios from "axios"
 
-export type users = {
-    id: number
-    name: string
-    email: string
-    company: { name: string }
-    address: { city: string }
+export type User = {
+  id: number
+  name: string
+  email: string
+  company: { name: string }
+  address: { city: string }
+}
+
+type EditBtProps = {
+  userId: string
+}
+
+const BASE_URL = `https://jsonplaceholder.typicode.com/users`
+
+function EditBt({ userId }: EditBtProps) {
+
+  const queryClient = useQueryClient()
+  const [editingUser, setEditingUser] = useState<User | null>(null)
+
+  // ✅ fetch only this specific user using the prop
+  const fetchUser = async (): Promise<User> => {
+    const res = await axios.get(`${BASE_URL}/${userId}`)
+    return res.data
   }
 
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["user", userId],
+    queryFn: fetchUser,
+  })
 
-
-function EditBt() {
-  const {id} = useParams()
-  const queryClient = useQueryClient()
-const [editingUser,setEditingUser] =useState<users | null>(null)
-
-const BASE_URL = `https://jsonplaceholder.typicode.com/users/${id}`
-
-const fetchUser = async (): Promise<users>   =>{
-  const res = await axios.get(BASE_URL)
-
-  return res.data
-}
- const {data,isLoading,error} = useQuery({
-  queryKey:["users", id],
-queryFn: fetchUser
- })
-
-const handleEdit = () => {
+  const handleEdit = () => {
     if (data) setEditingUser(data)
   }
 
-  const handleEditChange = (field: keyof users, value: string) => {
+  const handleEditChange = (field: keyof User, value: string) => {
     if (!editingUser) return
     setEditingUser((prev) => {
       if (!prev) return prev
@@ -45,38 +47,45 @@ const handleEdit = () => {
   }
 
   const editMutation = useMutation({
-    mutationFn: async (updatedUser: users) => {
-      const res = await axios.patch<users>(
-        `https://jsonplaceholder.typicode.com/users/${updatedUser.id}`,
-       updatedUser
+    mutationFn: async (updatedUser: User) => {
+      // ✅ use updatedUser.id, not the whole object
+      const res = await axios.patch<User>(
+        `${BASE_URL}/${updatedUser.id}`,
+        updatedUser
       )
       return res.data
     },
 
     onSuccess: (updatedUser) => {
-      queryClient.setQueryData(["users", id], updatedUser)
-
-      //  updating the list cache if it exists
-      queryClient.setQueryData(["users"], (old: users[] | undefined) =>
+      // ✅ removed the duplicate setQueryData call
+      // update the list cache if it exists
+      queryClient.setQueryData(["users"], (old: User[] | undefined) =>
         old?.map((u) => (u.id === updatedUser.id ? updatedUser : u))
       )
+      // update the single user cache
+      queryClient.setQueryData(["user", userId], updatedUser)
 
       setEditingUser(null)
     },
   })
 
-if(isLoading) return<p>loading</p>
-if(error) return <p>error occured</p>
-
-
-
+  if (isLoading) return <p className="text-white text-sm">loading...</p>
+  if (error) return <p className="text-red-500 text-sm">error occurred</p>
 
   return (
     <div>
-      <button className="border cursor-pointer bg-red-700 text-white p-3"
-      onClick={handleEdit}></button>
+      {/* ✅ button has a label now */}
+      <button
+        className="border cursor-pointer mt-2 bg-red-700 text-white p-2"
+        onClick={(e) => {
+          e.stopPropagation()
+          handleEdit()
+        }}
+      >
+        Edit
+      </button>
 
-        {editingUser && (
+      {editingUser && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded shadow-lg w-full max-w-md">
             <h2 className="text-xl font-bold mb-4 text-red-900 uppercase">

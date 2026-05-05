@@ -237,7 +237,7 @@ function Home() {
               <h1 className="mt-2">COMPANY: {user.company.name}</h1>
               <h1 className="mt-2">CITY: {user.address.city}</h1>
 
-              <div className='flex justify-center gap-6'>
+              <div className='flex justify-center gap-6 mt-6'>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
@@ -248,7 +248,7 @@ function Home() {
                 remove member
               </button>
 
-              <EditBt userId={user.id} />
+              <EditBt/>
               </div>
 
             </div>

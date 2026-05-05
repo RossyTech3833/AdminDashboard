@@ -74,7 +74,7 @@ function EditBt({ userId }: EditBtProps) {
     <div>
       
       <button
-        className="border cursor-pointer mt-2 bg-red-700 text-white p-2"
+        className="border cursor-pointer mt-2 bg-red-700 text-black p-2"
         onClick={(e) => {
           e.stopPropagation()
           handleEdit()

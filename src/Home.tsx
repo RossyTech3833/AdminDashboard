@@ -237,6 +237,7 @@ function Home() {
               <h1 className="mt-2">COMPANY: {user.company.name}</h1>
               <h1 className="mt-2">CITY: {user.address.city}</h1>
 
+              <div className='flex justify-center gap-6'>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
@@ -248,6 +249,8 @@ function Home() {
               </button>
 
               <EditBt userId={user.id} />
+              </div>
+
             </div>
           </div>
         ))}

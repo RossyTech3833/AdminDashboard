@@ -21,7 +21,6 @@ function EditBt({ userId }: EditBtProps) {
   const queryClient = useQueryClient()
   const [editingUser, setEditingUser] = useState<User | null>(null)
 
-  // ✅ fetch only this specific user using the prop
   const fetchUser = async (): Promise<User> => {
     const res = await axios.get(`${BASE_URL}/${userId}`)
     return res.data
@@ -48,7 +47,7 @@ function EditBt({ userId }: EditBtProps) {
 
   const editMutation = useMutation({
     mutationFn: async (updatedUser: User) => {
-      // ✅ use updatedUser.id, not the whole object
+     
       const res = await axios.patch<User>(
         `${BASE_URL}/${updatedUser.id}`,
         updatedUser
@@ -57,12 +56,11 @@ function EditBt({ userId }: EditBtProps) {
     },
 
     onSuccess: (updatedUser) => {
-      // ✅ removed the duplicate setQueryData call
-      // update the list cache if it exists
+     
       queryClient.setQueryData(["users"], (old: User[] | undefined) =>
         old?.map((u) => (u.id === updatedUser.id ? updatedUser : u))
       )
-      // update the single user cache
+      
       queryClient.setQueryData(["user", userId], updatedUser)
 
       setEditingUser(null)
@@ -74,7 +72,7 @@ function EditBt({ userId }: EditBtProps) {
 
   return (
     <div>
-      {/* ✅ button has a label now */}
+      
       <button
         className="border cursor-pointer mt-2 bg-red-700 text-white p-2"
         onClick={(e) => {
@@ -132,13 +130,13 @@ function EditBt({ userId }: EditBtProps) {
               <button
                 onClick={() => editMutation.mutate(editingUser)}
                 disabled={editMutation.isPending}
-                className="bg-green-600 text-white p-2 flex-1 cursor-pointer disabled:opacity-50"
+                className="bg-green-600 text-black p-2 flex-1 cursor-pointer disabled:opacity-50"
               >
                 {editMutation.isPending ? "Saving..." : "Save"}
               </button>
               <button
                 onClick={() => setEditingUser(null)}
-                className="bg-gray-400 text-white p-2 flex-1 cursor-pointer"
+                className="bg-gray-400 text-black p-2 flex-1 cursor-pointer"
               >
                 Cancel
               </button>

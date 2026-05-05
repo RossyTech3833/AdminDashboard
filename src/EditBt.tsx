@@ -71,7 +71,7 @@ function EditBt({ userId }: EditBtProps) {
   return (
     <div>
       <button
-        className="border cursor-pointer mt-2 bg-red-700 text-white p-2"
+        className="border cursor-pointer mt-2 bg-red-700 text-black p-2"
         onClick={(e) => {
           e.stopPropagation()
           handleEdit()
@@ -135,7 +135,7 @@ function EditBt({ userId }: EditBtProps) {
                   editMutation.mutate(editingUser)
                 }}
                 disabled={editMutation.isPending}
-                className="bg-green-600 text-white p-2 flex-1 cursor-pointer disabled:opacity-50"
+                className="bg-green-600 text-black p-2 flex-1 cursor-pointer disabled:opacity-50"
               >
                 {editMutation.isPending ? "Saving..." : "Save"}
               </button>
@@ -144,7 +144,7 @@ function EditBt({ userId }: EditBtProps) {
                   e.stopPropagation() 
                   setEditingUser(null)
                 }}
-                className="bg-gray-400 text-white p-2 flex-1 cursor-pointer"
+                className="bg-gray-400 text-black p-2 flex-1 cursor-pointer"
               >
                 Cancel
               </button>

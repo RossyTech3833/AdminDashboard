@@ -248,7 +248,7 @@ function Home() {
                 remove member
               </button>
 
-              <EditBt/>
+              <EditBt userId={user.id}/>
               </div>
 
             </div>

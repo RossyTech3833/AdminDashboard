@@ -2,9 +2,9 @@ import { useMutation, useQuery, keepPreviousData } from '@tanstack/react-query'
 import { useState } from 'react'
 import NewUser from './NewUser'
 import { useNavigate } from 'react-router-dom'
-import { queryClient } from './main'
+import { queryClient } from '../main'
 import axios from 'axios'
-import EditBt from './EditBt'
+import EditBt from '../Shared/EditBt'
 
 type NewMemberForm = {
   name: string;

@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useParams, useNavigate } from "react-router-dom"
-import Todos from "./Todos"
+import Todos from "../Features/Todos"
 import { useState } from "react"
 import axios from "axios"
-import Post from "./Post"
+import Post from "../Features/Post"
 
 export type users = {
   id: number

@@ -1,8 +1,8 @@
 import { HashRouter,Route,Routes } from 'react-router-dom'
 import './App.css'
-import Home from './Home'
-import { MembersDetails } from './MembersDetails'
-import Footer from './Footer'
+import Home from './components/Home'
+import { MembersDetails } from './components/MembersDetails'
+import Footer from './Shared/Footer'
 
 
 

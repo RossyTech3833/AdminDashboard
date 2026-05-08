@@ -112,7 +112,7 @@ function EditBt({ userId }: EditBtProps) {
 
             <label className="block mb-2 text-black">
               Company
-              <input
+              <input 
                 className="border w-full p-2 mt-1 text-black"
                 value={editingUser.company.name}
                 onChange={(e) => handleEditChange("company", e.target.value)}

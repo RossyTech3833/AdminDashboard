@@ -69,7 +69,7 @@ function EditBt({ userId }: EditBtProps) {
   })
 
   return (
-    <div>
+    <div className="m-2">
       <button
         className="border cursor-pointer mt-2 bg-red-700 text-black p-2"
         onClick={(e) => {
@@ -92,37 +92,37 @@ function EditBt({ userId }: EditBtProps) {
               Edit Member
             </h2>
 
-            <label className="block mb-2">
+            <label className="block mb-2 text-black">
               Name
               <input
-                className="border w-full p-2 mt-1"
+                className="border w-full p-2 mt-1 text-black"
                 value={editingUser.name}
                 onChange={(e) => handleEditChange("name", e.target.value)}
               />
             </label>
 
-            <label className="block mb-2">
+            <label className="block mb-2 text-black">
               Email
               <input
-                className="border w-full p-2 mt-1"
+                className="border w-full p-2 mt-1 text-black"
                 value={editingUser.email}
                 onChange={(e) => handleEditChange("email", e.target.value)}
               />
             </label>
 
-            <label className="block mb-2">
+            <label className="block mb-2 text-black">
               Company
               <input
-                className="border w-full p-2 mt-1"
+                className="border w-full p-2 mt-1 text-black"
                 value={editingUser.company.name}
                 onChange={(e) => handleEditChange("company", e.target.value)}
               />
             </label>
 
-            <label className="block mb-4">
+            <label className="block mb-4 text-black">
               City
               <input
-                className="border w-full p-2 mt-1"
+                className="border w-full p-2 mt-1 text-black"
                 value={editingUser.address.city}
                 onChange={(e) => handleEditChange("address", e.target.value)}
               />
